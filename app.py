@@ -4,18 +4,14 @@ import uuid
 from werkzeug.utils import secure_filename
 from predictor import predict_emotion_from_text, predict_emotion_from_audio
 
-# Configuration
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'wav', 'mp3', 'm4a', 'ogg'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.secret_key = 'your_secret_key'  # Needed for flashing messages
-
-# Ensure upload folder exists
+app.secret_key = 'your_secret_key' 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Utility Functions
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -26,7 +22,6 @@ def save_file(file):
     file.save(filepath)
     return filepath, filename
 
-# Routes
 @app.route('/', methods=['GET', 'POST'])
 def index():
     emotion_result = None
@@ -34,12 +29,11 @@ def index():
     audio_file_name = None
 
     if request.method == 'POST':
-        # Handle text input
+
         user_text = request.form.get('text_input', '').strip()
         if user_text:
             emotion_result = predict_emotion_from_text(user_text)
         
-        # Handle audio upload
         elif 'audio_file' in request.files:
             file = request.files['audio_file']
             if file and allowed_file(file.filename):
@@ -58,6 +52,5 @@ def index():
         audio_file=audio_file_name
     )
 
-# Main Execution
 if __name__ == '__main__':
     app.run(debug=True)
